@@ -1,0 +1,9 @@
+#!/usr/bin/env python3
+from fortunato import Person
+
+if __name__ == "__main__":
+    name = input('What is your name? ')
+    age = input('What is your age? ')
+    person = Person(name, age)
+    fortune = person.get_fortune()
+    print(fortune)

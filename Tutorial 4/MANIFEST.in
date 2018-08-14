@@ -1,0 +1,4 @@
+include .coveragerc
+include AUTHORS
+include README.rst
+include setup.cfg

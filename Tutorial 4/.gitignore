@@ -1,0 +1,14 @@
+# Django files
+fortunato/settings/local_settings.py
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+__pycache__/
+
+# Distribution / packaging
+.eggs/
+*.egg-info/
+
+# Unit test / coverage reports
+.coverage
+htmlcov/
