@@ -1,0 +1,60 @@
+---
+- name: Install dependencies
+  apt:
+    pkg: git
+    state: latest
+
+- name: Git clone the remote repo
+  git:
+    accept_hostkey: yes
+    depth: 1
+    dest: /opt/fortunato
+    force: yes
+    repo: https://github.com/data-get/fortunato.git
+    version: master
+
+- name: Install fortunato
+  command: pipenv sync
+  args:
+    chdir: /opt/fortunato/Tutorial 4/
+    creates: /opt/fortunato/Tutorial 4/.venv
+  environment:
+    PIPENV_VENV_IN_PROJECT: true
+  become: true
+
+- name: Set file owners
+  file:
+    path: /opt/fortunato
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Copy over local_settings.py
+  template:
+    src: "opt/fortunato/Tutorial 4/fortunato/settings/local_settings.py"
+    dest: "/opt/fortunato/Tutorial 4/fortunato/settings/local_settings.py"
+    owner: www-data
+    group: www-data
+    mode: 0644
+
+- name: Create the static folder
+  file:
+    path: /var/www/www.fortunato.com/static
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0755
+
+- name: Install fortunato
+  command: pipenv run ./manage.py collectstatic
+  args:
+    chdir: /opt/fortunato/Tutorial 4
+    creates: /var/www/www.fortunato.com/static/imgs
+  become: true
+
+- name: Set file owners for static files
+  file:
+    path: /var/www/www.fortunato.com/static
+    state: directory
+    owner: www-data
+    group: www-data

@@ -1,0 +1,6 @@
+- name: reload uwsgi
+  systemd:
+    state: started
+    enabled: yes
+    name: emperor.uwsgi.service
+    daemon_reload: yes
