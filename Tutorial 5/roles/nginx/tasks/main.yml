@@ -1,0 +1,64 @@
+---
+- name: Add nginx repo key
+  apt_key:
+    url: "https://nginx.org/keys/nginx_signing.key"
+    state: present
+
+- name: Add the nginx repo
+  apt_repository:
+    repo: "deb [arch=amd64] http://nginx.org/packages/ubuntu/ {{ ansible_lsb.codename }} nginx"
+    state: present
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: latest
+    update_cache: yes
+  notify:
+    - reload nginx
+
+- name: Copy over nginx config files
+  copy:
+    src: etc/nginx/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: Create the sites-available and sites-enabled folders
+  file:
+    path: "/etc/nginx/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - sites-available
+    - sites-enabled
+
+- name: Remove default config
+  file:
+    path: "/etc/nginx/conf.d/default.conf"
+    state: absent
+  notify:
+    - reload nginx
+
+- name: Copy over the www.fortunato.com nginx file
+  copy:
+    src: "etc/nginx/sites-available/www.fortunato.com"
+    dest: "/etc/nginx/sites-available/www.fortunato.com"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: Enable www.fortunato.com.ini
+  file:
+    src: /etc/nginx/sites-available/www.fortunato.com
+    dest: /etc/nginx/sites-enabled/www.fortunato.com
+    state: link
+  notify:
+    - reload nginx

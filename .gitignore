@@ -9,3 +9,6 @@ __pycache__/
 # Unit test / coverage reports
 .coverage
 htmlcov/
+
+# Temp files
+*.retry

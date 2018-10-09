@@ -1,0 +1,80 @@
+---
+- name: Install dependencies and uwsgi
+  apt:
+    pkg: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+    - libpcre3
+    - libpcre3-dev
+    - uwsgi
+
+- name: Apt hold uwsgi
+  command: apt-mark hold uwsgi
+  become: true
+
+- name: Install uwsgi through pip
+  pip:
+    name: uwsgi
+
+- name: Disable apt uwsgi from starting
+  systemd:
+    state: stopped
+    enabled: no
+    name: uwsgi
+
+- name: Make log folders
+  file:
+    path: /var/log/uwsgi
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0755
+
+- name: Copy over the systemd service file
+  copy:
+    src: "etc/systemd/system/emperor.uwsgi.service"
+    dest: "/etc/systemd/system/emperor.uwsgi.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload uwsgi
+
+- name: Copy over the emperor.ini uwsgi file
+  copy:
+    src: "etc/uwsgi/emperor.ini"
+    dest: "/etc/uwsgi/emperor.ini"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload uwsgi
+
+- name: Copy over the vassals-default.ini uwsgi file
+  copy:
+    src: "etc/uwsgi/vassals-default.ini"
+    dest: "/etc/uwsgi/vassals-default.ini"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload uwsgi
+
+- name: Copy over the www.fortunato.com.ini uwsgi file
+  copy:
+    src: "etc/uwsgi/apps-available/www.fortunato.com.ini"
+    dest: "/etc/uwsgi/apps-available/www.fortunato.com.ini"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload uwsgi
+
+- name: Enable www.fortunato.com.ini
+  file:
+    src: /etc/uwsgi/apps-available/www.fortunato.com.ini
+    dest: /etc/uwsgi/apps-enabled/www.fortunato.com.ini
+    state: link
+  notify:
+    - reload uwsgi

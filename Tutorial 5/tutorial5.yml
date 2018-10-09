@@ -1,0 +1,12 @@
+---
+- name: Setup a System for Tutorial 5
+  hosts: users
+  gather_facts: True
+  user: "{{ default_user }}"
+  become: True
+  vars_files:
+    - vars/secure.yml
+  roles:
+    - fortunato
+    - uwsgi
+    - nginx
